@@ -9,4 +9,5 @@
 - [ ] Add the bundling script for RN
 - [ ] Add the brownfield entrypoint
 - [ ] Patch ExpoModulesProvider
+- [ ] Add build configurations
 - [ ] Figure out building

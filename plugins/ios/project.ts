@@ -16,7 +16,10 @@ export const createFramework = (
   ) as unknown as Target;
 };
 
-export const getGroupByUUID = (project: XcodeProject, uuid: string): PbxGroup => {
+export const getGroupByUUID = (
+  project: XcodeProject,
+  uuid: string
+): PbxGroup => {
   return project.getPBXGroupByKey(uuid) as unknown as PbxGroup;
 };
 

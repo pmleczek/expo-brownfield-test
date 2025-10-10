@@ -4,10 +4,10 @@ import {
   withPodfileProperties,
   withXcodeProject,
 } from "expo/config-plugins";
-import fs from "node:fs";
 import path from "node:path";
 import { addNewPodsTarget } from "./ios/podfile";
 import { createFramework, createGroup } from "./ios/project";
+import { mkdir } from "./utils/filesystem";
 
 const TARGET_NAME = "BrownfieldApp";
 
@@ -18,14 +18,9 @@ const withXcodeProjectPlugin: ConfigPlugin = (config) => {
 
     createFramework(xcodeProject, TARGET_NAME);
 
-    fs.mkdirSync(path.join(projectRoot, "ios", TARGET_NAME), {
-      recursive: true,
-    });
-    createGroup(
-      xcodeProject,
-      TARGET_NAME,
-      path.join(projectRoot, "ios", TARGET_NAME)
-    );
+    const groupPath = path.join(projectRoot, "ios", TARGET_NAME);
+    mkdir(groupPath);
+    createGroup(xcodeProject, TARGET_NAME, groupPath);
 
     return config;
   });

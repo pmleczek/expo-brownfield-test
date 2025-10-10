@@ -32,3 +32,17 @@ export interface Group {
   uuid: string;
   pbxGroup: PbxGroup;
 }
+
+export interface File {
+  basename: string;
+  lastKnownFileType: string;
+  group: string;
+  path: string;
+  defaultEncoding: number;
+  fileEncoding: number;
+  sourceTree: string;
+  includeInIndex: number;
+  fileRef: string;
+  target: string;
+  uuid: string;
+}
