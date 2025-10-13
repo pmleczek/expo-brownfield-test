@@ -48,3 +48,30 @@ export const createGroup = (
 
   return group;
 };
+
+export const configureBuildSettings = (project: XcodeProject) => {
+  const nativeTargetSection = project.pbxNativeTargetSection();
+
+  const mainTargetKey = Object.keys(nativeTargetSection).find(
+    (key) =>
+      !key.endsWith("_comment") &&
+      nativeTargetSection[key].productType ===
+        '"com.apple.product-type.application"'
+  );
+  const mainTarget = nativeTargetSection[mainTargetKey];
+
+  const BUNDLE_PHASE_NAME = "Bundle React Native code and images";
+  const bundlePhase = mainTarget.buildPhases.find((phase: any) =>
+    phase.comment.includes(BUNDLE_PHASE_NAME)
+  );
+
+  const destTargetKey = Object.keys(nativeTargetSection).find(
+    (key) =>
+      !key.endsWith("_comment") &&
+      nativeTargetSection[key].productType !==
+        '"com.apple.product-type.application"'
+  );
+  const destTarget = nativeTargetSection[destTargetKey];
+
+  destTarget.buildPhases = [...destTarget.buildPhases, bundlePhase];
+};

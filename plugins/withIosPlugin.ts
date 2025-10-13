@@ -6,7 +6,11 @@ import {
 } from "expo/config-plugins";
 import path from "node:path";
 import { addNewPodsTarget } from "./ios/podfile";
-import { createFramework, createGroup } from "./ios/project";
+import {
+  configureBuildSettings,
+  createFramework,
+  createGroup,
+} from "./ios/project";
 import { mkdir } from "./utils/filesystem";
 
 const TARGET_NAME = "BrownfieldApp";
@@ -21,6 +25,10 @@ const withXcodeProjectPlugin: ConfigPlugin = (config) => {
     const groupPath = path.join(projectRoot, "ios", TARGET_NAME);
     mkdir(groupPath);
     createGroup(xcodeProject, TARGET_NAME, groupPath);
+
+    // TODO: Create and add the entrypoint file
+
+    configureBuildSettings(xcodeProject);
 
     return config;
   });
