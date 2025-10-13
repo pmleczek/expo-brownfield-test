@@ -7,11 +7,16 @@ import {
 import path from "node:path";
 import { addNewPodsTarget } from "./ios/podfile";
 import {
+  configureBuildPhases,
   configureBuildSettings,
   createFramework,
   createGroup,
 } from "./ios/project";
-import { mkdir } from "./utils/filesystem";
+import {
+  createFileFromTemplate,
+  createFileFromTemplateAs,
+  mkdir,
+} from "./utils/filesystem";
 
 const TARGET_NAME = "BrownfieldApp";
 
@@ -20,15 +25,38 @@ const withXcodeProjectPlugin: ConfigPlugin = (config) => {
     const projectRoot = config.modRequest.projectRoot;
     const xcodeProject = config.modResults;
 
-    createFramework(xcodeProject, TARGET_NAME);
+    const target = createFramework(xcodeProject, TARGET_NAME);
 
     const groupPath = path.join(projectRoot, "ios", TARGET_NAME);
     mkdir(groupPath);
-    createGroup(xcodeProject, TARGET_NAME, groupPath);
+    createFileFromTemplate("ExpoApp.swift", "ios", groupPath);
+    createGroup(xcodeProject, TARGET_NAME, groupPath, ["ExpoApp.swift"]);
 
-    // TODO: Create and add the entrypoint file
+    createFileFromTemplate("Info.plist", "ios", groupPath, {
+      targetName: TARGET_NAME,
+    });
+    createFileFromTemplateAs(
+      "Target.entitlements",
+      "ios",
+      groupPath,
+      TARGET_NAME + ".entitlements"
+    );
 
-    configureBuildSettings(xcodeProject);
+    configureBuildPhases(xcodeProject, target);
+    configureBuildSettings(
+      xcodeProject,
+      TARGET_NAME,
+      config.ios?.buildNumber || "1"
+    );
+
+    xcodeProject.addBuildPhase(
+      ["BrownfieldApp/ExpoApp.swift"],
+      "PBXSourcesBuildPhase",
+      target.pbxNativeTarget.name,
+      target.uuid,
+      "framework",
+      '""'
+    );
 
     return config;
   });
