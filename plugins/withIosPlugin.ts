@@ -5,7 +5,7 @@ import {
   withXcodeProject,
 } from "expo/config-plugins";
 import path from "node:path";
-import { addNewPodsTarget } from "./ios/podfile";
+import { addCustomRubyScriptImport, addNewPodsTarget } from "./ios/podfile";
 import {
   configureBuildPhases,
   configureBuildSettings,
@@ -64,6 +64,9 @@ const withXcodeProjectPlugin: ConfigPlugin = (config) => {
 
 const withPodfilePlugin: ConfigPlugin = (config) => {
   return withPodfile(config, (config) => {
+    config.modResults.contents = addCustomRubyScriptImport(
+      config.modResults.contents
+    );
     config.modResults.contents = addNewPodsTarget(
       config.modResults.contents,
       TARGET_NAME

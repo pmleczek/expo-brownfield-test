@@ -10,7 +10,7 @@
 - [X] Add the brownfield entrypoint
 - [X] Patch ExpoModulesProvider
 - [X] Add build configurations
-- [ ] Ensure proper patch call order
+- [X] Ensure proper patch call order
 - [ ] Figure out building
 - [ ] Improve type safety
 - [ ] Clean up the code

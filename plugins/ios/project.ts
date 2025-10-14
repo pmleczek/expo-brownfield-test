@@ -80,14 +80,7 @@ export const configureBuildPhases = (project: XcodeProject, target: Target) => {
 
   if [ -f "$FILE" ]; then
     echo "Patching $FILE to hide Expo from public interface"
-
-    # 1. Replace imports with internal imports
-    sed -i '' 's/^import EX/internal import EX/' "$FILE"
-    
-    sed -i '' 's/^import Ex/internal import Ex/' "$FILE"
-
-    # 2. Replace class visibility
-    sed -i '' 's/public class ExpoModulesProvider/internal class ExpoModulesProvider/' "$FILE"
+    perl -pi -e 's/^import EX/internal import EX/g; s/^import Ex/internal import Ex/g; s/public class ExpoModulesProvider/internal class ExpoModulesProvider/g;' "$FILE"
   fi
   `;
 
@@ -190,5 +183,9 @@ const getCommonBuildSettings = (
     SWIFT_OPTIMIZATION_LEVEL: `"-Onone"`,
     CODE_SIGN_ENTITLEMENTS: `"${targetName}/${targetName}.entitlements"`,
     // DEVELOPMENT_TEAM: `""`,
+    BUILD_LIBRARIES_FOR_DISTRIBUTION: '"YES"',
+    USER_SCRIPT_SANDBOXING: '"NO"',
+    SKIP_INSTALL: '"NO"',
+    ENABLE_MODULE_VERIFIER: '"NO"',
   };
 };
