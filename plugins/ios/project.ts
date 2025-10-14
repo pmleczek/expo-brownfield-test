@@ -186,7 +186,7 @@ const getCommonBuildSettings = (
     SWIFT_OPTIMIZATION_LEVEL: `"-Onone"`,
     CODE_SIGN_ENTITLEMENTS: `"${targetName}/${targetName}.entitlements"`,
     // DEVELOPMENT_TEAM: `""`,
-    BUILD_LIBRARIES_FOR_DISTRIBUTION: '"YES"',
+    BUILD_LIBRARY_FOR_DISTRIBUTION: '"YES"',
     USER_SCRIPT_SANDBOXING: '"NO"',
     SKIP_INSTALL: '"NO"',
     ENABLE_MODULE_VERIFIER: '"NO"',
