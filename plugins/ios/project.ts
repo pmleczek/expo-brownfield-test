@@ -5,14 +5,14 @@ import type { Group, PbxGroup, Target } from "./types";
 
 export const createFramework = (
   project: XcodeProject,
-  targetName: string
+  targetName: string,
+  bundleIdentifier: string,
 ): Target => {
   return project.addTarget(
     targetName,
     Constants.Target.Framework,
     targetName,
-    // TODO: use value from config instead of hardcoding
-    `com.pmleczek.expo-brownfield-test.${targetName}`
+    bundleIdentifier
   ) as unknown as Target;
 };
 
@@ -49,7 +49,11 @@ export const createGroup = (
   return group;
 };
 
-export const configureBuildPhases = (project: XcodeProject, target: Target, files: string[] = []) => {
+export const configureBuildPhases = (
+  project: XcodeProject,
+  target: Target,
+  files: string[] = []
+) => {
   const nativeTargetSection = project.pbxNativeTargetSection();
 
   const mainTargetKey = Object.keys(nativeTargetSection).find(
@@ -89,20 +93,20 @@ export const configureBuildPhases = (project: XcodeProject, target: Target, file
     target.pbxNativeTarget.name,
     target.uuid,
     Constants.Target.Framework,
-    '""'
+    Constants.Utils.XCEmptyString
   );
 };
 
 export const configureBuildSettings = (
   project: XcodeProject,
   targetName: string,
-  currentProjectVersion: string
+  currentProjectVersion: string,
+  bundleIdentifier: string,
 ) => {
   const commonBuildSettings = getCommonBuildSettings(
     targetName,
     currentProjectVersion,
-    // TODO: use value from config instead of hardcoding
-    `com.pmleczek.expo-brownfield-test.${targetName}`
+    bundleIdentifier,
   );
 
   const buildConfigurationList = [
@@ -160,7 +164,6 @@ const getCommonBuildSettings = (
     DEBUG_INFORMATION_FORMAT = dwarf;
     DEVELOPMENT_TEAM = ;
     GCC_C_LANGUAGE_STANDARD = gnu11;
-    
     LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @executable_path/../../Frameworks";
     MARKETING_VERSION = 1.0;
     MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
