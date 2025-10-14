@@ -12,50 +12,44 @@ import {
   createFramework,
   createGroup,
 } from "./ios/project";
+import { Constants } from "./utils/constants";
 import {
   createFileFromTemplate,
   createFileFromTemplateAs,
   mkdir,
 } from "./utils/filesystem";
 
-const TARGET_NAME = "BrownfieldApp";
-
 const withXcodeProjectPlugin: ConfigPlugin = (config) => {
   return withXcodeProject(config, (config) => {
     const projectRoot = config.modRequest.projectRoot;
     const xcodeProject = config.modResults;
 
-    const target = createFramework(xcodeProject, TARGET_NAME);
+    const target = createFramework(xcodeProject, Constants.Target.Name);
 
-    const groupPath = path.join(projectRoot, "ios", TARGET_NAME);
+    const groupPath = path.join(projectRoot, "ios", Constants.Target.Name);
     mkdir(groupPath);
     createFileFromTemplate("ExpoApp.swift", "ios", groupPath);
-    createGroup(xcodeProject, TARGET_NAME, groupPath, ["ExpoApp.swift"]);
+    createGroup(xcodeProject, Constants.Target.Name, groupPath, [
+      "ExpoApp.swift",
+    ]);
 
     createFileFromTemplate("Info.plist", "ios", groupPath, {
-      targetName: TARGET_NAME,
+      targetName: Constants.Target.Name,
     });
     createFileFromTemplateAs(
       "Target.entitlements",
       "ios",
       groupPath,
-      TARGET_NAME + ".entitlements"
+      Constants.Target.Name + ".entitlements"
     );
 
-    configureBuildPhases(xcodeProject, target);
+    configureBuildPhases(xcodeProject, target, [
+      `${Constants.Target.Name}/ExpoApp.swift`,
+    ]);
     configureBuildSettings(
       xcodeProject,
-      TARGET_NAME,
+      Constants.Target.Name,
       config.ios?.buildNumber || "1"
-    );
-
-    xcodeProject.addBuildPhase(
-      ["BrownfieldApp/ExpoApp.swift"],
-      "PBXSourcesBuildPhase",
-      target.pbxNativeTarget.name,
-      target.uuid,
-      "framework",
-      '""'
     );
 
     return config;
@@ -69,7 +63,7 @@ const withPodfilePlugin: ConfigPlugin = (config) => {
     );
     config.modResults.contents = addNewPodsTarget(
       config.modResults.contents,
-      TARGET_NAME
+      Constants.Target.Name
     );
     return config;
   });

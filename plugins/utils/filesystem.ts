@@ -22,13 +22,10 @@ const interpolateVariables = (
   return str;
 };
 
-const createFileFromTemplateInternal = (
+const readTemplate = (
   template: string,
-  platform: "ios" | "android",
-  at: string,
-  dest: string,
-  variables?: Record<string, unknown>
-) => {
+  platform: "ios" | "android"
+): string => {
   const templatesPath = path.join(__filename, "../..", "templates", platform);
   const templatePath = path.join(templatesPath, template);
 
@@ -36,7 +33,17 @@ const createFileFromTemplateInternal = (
     throw new Error();
   }
 
-  let templateContents = fs.readFileSync(templatePath).toString();
+  return fs.readFileSync(templatePath).toString();
+};
+
+const createFileFromTemplateInternal = (
+  template: string,
+  platform: "ios" | "android",
+  at: string,
+  dest: string,
+  variables?: Record<string, unknown>
+) => {
+  let templateContents = readTemplate(template, platform);
   if (variables) {
     templateContents = interpolateVariables(templateContents, variables);
   }
@@ -62,4 +69,17 @@ export const createFileFromTemplateAs = (
   variables?: Record<string, unknown>
 ) => {
   createFileFromTemplateInternal(template, platform, at, as, variables);
+};
+
+export const readFromTemplate = (
+  template: string,
+  platform: "ios" | "android",
+  variables?: Record<string, unknown>
+): string => {
+  let templateContents = readTemplate(template, platform);
+  if (variables) {
+    templateContents = interpolateVariables(templateContents, variables);
+  }
+
+  return templateContents;
 };

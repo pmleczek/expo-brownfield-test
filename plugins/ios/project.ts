@@ -1,7 +1,7 @@
 import type { XcodeProject } from "@expo/config-plugins";
+import { Constants } from "../utils/constants";
+import { readFromTemplate } from "../utils/filesystem";
 import type { Group, PbxGroup, Target } from "./types";
-
-const FRAMEWORK_TYPE = "framework";
 
 export const createFramework = (
   project: XcodeProject,
@@ -9,7 +9,7 @@ export const createFramework = (
 ): Target => {
   return project.addTarget(
     targetName,
-    FRAMEWORK_TYPE,
+    Constants.Target.Framework,
     targetName,
     // TODO: use value from config instead of hardcoding
     `com.pmleczek.expo-brownfield-test.${targetName}`
@@ -49,47 +49,47 @@ export const createGroup = (
   return group;
 };
 
-export const configureBuildPhases = (project: XcodeProject, target: Target) => {
+export const configureBuildPhases = (project: XcodeProject, target: Target, files: string[] = []) => {
   const nativeTargetSection = project.pbxNativeTargetSection();
 
   const mainTargetKey = Object.keys(nativeTargetSection).find(
     (key) =>
       !key.endsWith("_comment") &&
       nativeTargetSection[key].productType ===
-        '"com.apple.product-type.application"'
+        Constants.Target.ApplicationProductType
   );
   const mainTarget = nativeTargetSection[mainTargetKey];
 
-  const BUNDLE_PHASE_NAME = "Bundle React Native code and images";
   const bundlePhase = mainTarget.buildPhases.find((phase: any) =>
-    phase.comment.includes(BUNDLE_PHASE_NAME)
+    phase.comment.includes(Constants.BuildPhase.RNBundlePhase)
   );
 
   const destTargetKey = Object.keys(nativeTargetSection).find(
     (key) =>
       !key.endsWith("_comment") &&
       nativeTargetSection[key].productType !==
-        '"com.apple.product-type.application"'
+        Constants.Target.ApplicationProductType
   );
   const destTarget = nativeTargetSection[destTargetKey];
 
   destTarget.buildPhases = [...destTarget.buildPhases, bundlePhase];
 
-  const script = `
-  FILE="\${SRCROOT}/Pods/Target Support Files/Pods-expobrownfieldtest-BrownfieldApp/ExpoModulesProvider.swift"
-
-  if [ -f "$FILE" ]; then
-    echo "Patching $FILE to hide Expo from public interface"
-    perl -pi -e 's/^import EX/internal import EX/g; s/^import Ex/internal import Ex/g; s/public class ExpoModulesProvider/internal class ExpoModulesProvider/g;' "$FILE"
-  fi
-  `;
-
+  const script = readFromTemplate("patch-expo.sh", "ios");
   project.addBuildPhase(
     [],
-    "PBXShellScriptBuildPhase",
-    "Patch ExpoModulesProvider",
+    Constants.BuildPhase.Script,
+    Constants.BuildPhase.PatchExpoPhase,
     target.uuid,
     { shellPath: "/bin/sh", shellScript: script }
+  );
+
+  project.addBuildPhase(
+    files,
+    Constants.BuildPhase.Sources,
+    target.pbxNativeTarget.name,
+    target.uuid,
+    Constants.Target.Framework,
+    '""'
   );
 };
 
@@ -134,7 +134,7 @@ export const configureBuildSettings = (
     (key) =>
       !key.endsWith("_comment") &&
       nativeTargetSection[key].productType !==
-        '"com.apple.product-type.application"'
+        Constants.Target.ApplicationProductType
   );
   const destTarget = nativeTargetSection[destTargetKey];
 
