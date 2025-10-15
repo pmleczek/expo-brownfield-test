@@ -6,7 +6,7 @@ import type { Group, PbxGroup, Target } from "./types";
 export const createFramework = (
   project: XcodeProject,
   targetName: string,
-  bundleIdentifier: string,
+  bundleIdentifier: string
 ): Target => {
   return project.addTarget(
     targetName,
@@ -101,12 +101,12 @@ export const configureBuildSettings = (
   project: XcodeProject,
   targetName: string,
   currentProjectVersion: string,
-  bundleIdentifier: string,
+  bundleIdentifier: string
 ) => {
   const commonBuildSettings = getCommonBuildSettings(
     targetName,
     currentProjectVersion,
-    bundleIdentifier,
+    bundleIdentifier
   );
 
   const buildConfigurationList = [

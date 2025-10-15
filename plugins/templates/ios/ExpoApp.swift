@@ -1,8 +1,8 @@
 import UIKit
 internal import Expo
 import Network
-import React
-import ReactAppDependencyProvider
+internal import React
+internal import ReactAppDependencyProvider
 
 public class ReactNativeHostManager {
   public static let shared = ReactNativeHostManager()
